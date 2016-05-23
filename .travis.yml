@@ -7,9 +7,25 @@ python:
 services:
   - docker
 
+env:
+  global:
+  - secure: "HhyEsjCQzzp5BXM0bMP3jsn2gwUGK6aD6xJKSzWS3oqj7237G7Yke23mZASEDZgcK97s7fr4Bljygb6h1hgbpZ4QhzH4fm+rwbhQ2REpDi2YScYwwFwSaJ5am7fKGOESacbPSFwl2uFZcGx4aiE/i9K/bruHMwOA07I+u1KiMgVLEYmJGSYqXS0mVzdBO4nkIkj8y3wcGbc7rI+UUQUyRJuXS1/n8BPT6XFou1fsY3eujJav9pj4MUzMsx7acfe5f6EuvjelCUQ273PTMje/Aw76mR5yhnoBTmJPhd+ygUPRigfKTsBhHxT5tY2q+YaeushTeJfpXPnacXmnLIQxKop5qRTLg3AvEN5YQM+IotfMWW5/YGqZ+enkE9wJkEfnKsQikdj5v6LR5MB4xmwFdy48Brn151/VGQqKQ4gX1h0ZsjGSvqjm6Y5ueT+s+j3PA5X8dhkHnG3Dmph3gxLiq+U2stcUYwhI9tMBz7JJNzwyztBmkgvx/9+1AFlQLUld9VxfWc/xjAVDezRlm/IKsJbMg4sbTRNBSG58JFI0WSkvKJV7jBDFx0aulnOXp7miKm4rxhboRrlm4EPekg3Hdd5auhPy/+P+0BnBANXAEn9Y+pxR0H8Lojm1suMXcnMalLrcs28DQVP2fRW43L+mki50VvwJtObK4uJ2sSUxgC8="
+  - secure: "G0ADscZepvWwF7PRY5JxtFOiCAmS0mmfTp/Pr9N0Ck2cHWxwLO84dggMjaSLGJcfbbX2uhd3AUhXyfsNBdh10n61Du9xHFJ2yK64fQnYZYV+7zcun1SDqVHKgHT2H+Zq7zEnvn4QjWcB7aJpMplAg0+In8MsSapZvDUXKH4pONyP64I+UdSnWqYT9+QFsJmUsuoFnJcsplr2g8ccZ95ASA1CWEGWXwdHM2OY42XhCUQHPPO+6bh2oBgKxsIDjUVQTYBqrnHuri3kldUK6Po9dGaZN+fz9EnNVsRCxvbuHBOMa6IcQfV0KTEInDRHJ/BNZWYmDM8eXp/lQjd4RPesj7D6fgOxTJHUOAXhToOUtP4V8rF4jW1EpLKIeQ3SPXikaFOK+Pln8ULlsdn2cR1uwy7eOckqcMoy0zNR2YZH982R23iWYyhcJhcmu/x6oNQYneHDjUGWJGmAiKmifaXZybPA5LlU1UbU7Rq0om5cLJ0CHe5AKDUsXvrOH/no+nCAQWpXJgjE3s2EH7BqTrDs4o/NRmJ3CCQGsbvzrB5I36sWz3maox+RJV+o4HQtMjXWl846J2YhzfVGSsH91gjpULWlEFnZlhgrc7hXSLRlQruCDVZvr+G61tiyfED0AQY9Rz3Inom2qH4ui/F3UO4AP8tmG+ENliNZoSkfuyWQM1I="
+  - secure: "ZlivwBNcp1BmpXMXRce2FE3wAZVBzMnlDH6j+JT0qxs6aYo7LWCAqbNnTjjB0MG22aU26yRDksNZEg7l/IRS8KOsDA2W8x9Cqd53jYcW69pDs37yhz/BJJFtw/PRuTjM/4c7/+1M3r4HJUsnaWqnBAu9R4DBeJ94fjxh0BZtKAiTcMYjXGKJU3XQEAaWfWd1Pu/1SbS71w+M/PlIpBHv5h1I+awEm+ZC4NNAUkKmqGUwMZGYsPGDuZvrebY/UlWeIhDH56rq7KnthW6cL/Lm2bFRCWSC9XgNUEydaeBabhcgU50SZ5hz6VBO/TWCWEGOmKoUmSCBVlou5GNsVDvrQxdMfm7m3Q8E3U0qCsQx6VDRXKO8MxLmUdU2kHpvneP8CC4+zWEv/hbOU4LVW0j3AI/i+nKTBAEhWHYx1Ck0PJq4ZFfeWTEeGQxJWSsMO6wzeTWiXWD870HqIdt+wuI4OSV1Q/aaNt8RJlS9gzXAmhE2c23fDdYzCRqsrm+/6+cPZltZ1HYmijxJ5yPRdjc+0ddIHJsMwmAi1f3JeXylwIwbq43TmUMT+aRbcZoIwMy4lvy8OL0ED8Y+PswKfJtCBXWF06WKHY3JA+m/+xMRQq9TB9ijeJL0I1KsqtVMnB34qmlbE02LYj79tJV1y/l47KQRCMKlAOnO0vc+Cmu84Is="
+  - COMMIT=${TRAVIS_COMMIT::8}
+
 before_install:
   - docker build -t bluemixcode/node-xvfb .
   - docker run -d --name xvfb xvfb
 
 script:
   - docker ps | grep -q xvfb
+
+after_success:
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=bluemixcode/node-xvfb
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
