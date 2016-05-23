@@ -17,7 +17,7 @@ env:
 
 before_install:
   - docker build -t $REPO:$COMMIT .
-  - docker run -d --name bluemixcode/node-xvfb xvfb
+  - docker run -d --name xvfb bluemixcode/node-xvfb
 
 script:
   - docker ps | grep -q xvfb
