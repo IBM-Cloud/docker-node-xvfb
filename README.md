@@ -10,5 +10,7 @@ This docker image contains Node.js and XVFB for running selenium and other UI te
 bluemixcode/node-xvfb
 ```
 
+Image - https://hub.docker.com/r/bluemixcode/node-xvfb/
+
 ## License
 Apache V2
