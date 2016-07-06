@@ -20,6 +20,7 @@ RUN apt-get install libasound2 -y
 RUN apt-get install libxtst6 -y
 RUN apt-get install libnotify4  -y
 RUN apt-get install xvfb -y
+RUN apt-get install libxss1 -y
 RUN export DISPLAY=:99.0
 RUN start-stop-daemon --start --quiet --pidfile /tmp/xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset
 RUN sleep 5
